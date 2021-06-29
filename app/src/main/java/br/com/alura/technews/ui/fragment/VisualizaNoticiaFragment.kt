@@ -16,7 +16,7 @@ import org.koin.core.parameter.parametersOf
 private const val NOTICIA_NAO_ENCONTRADA = "Notícia não encontrada"
 private const val MENSAGEM_FALHA_REMOCAO = "Não foi possível remover notícia"
 
-class VisualizaNoticiaFrament : Fragment() {
+class VisualizaNoticiaFragment : Fragment() {
 
     private val noticiaId: Long by lazy {
         arguments?.getLong(NOTICIA_ID_CHAVE)  ?: throw IllegalAccessException(" Id invalido")
@@ -25,13 +25,12 @@ class VisualizaNoticiaFrament : Fragment() {
     var quandoSelecionaMenuEdicao: () -> Unit = {}
     var quandoFinalizaTela: () -> Unit = {}
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        inflater?.inflate(R.menu.visualiza_noticia_menu, menu)
-        super.onCreateOptionsMenu(menu, inflater)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         //sempre habilitar se for usar menu
         setHasOptionsMenu(true)
-        verificaIdDaNoticia()
         buscaNoticiaSelecionada()
+        verificaIdDaNoticia()
     }
 
     override fun onCreateView(
@@ -40,6 +39,11 @@ class VisualizaNoticiaFrament : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.visualiza_noticia, container, false)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        inflater?.inflate(R.menu.visualiza_noticia_menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -52,11 +56,14 @@ class VisualizaNoticiaFrament : Fragment() {
 
 
     private fun buscaNoticiaSelecionada() {
-        viewModel.noticiaEncontrada.observe(this, Observer { noticiaEncontrada ->
-            noticiaEncontrada?.let {
-                preencheCampos(it)
+        viewModel.noticiaEncontrada.observe(
+            this,
+            Observer { noticiaEncontrada ->
+                noticiaEncontrada?.let {
+                    preencheCampos(it)
+                }
             }
-        })
+        )
     }
 
     private fun verificaIdDaNoticia() {
@@ -72,7 +79,7 @@ class VisualizaNoticiaFrament : Fragment() {
     }
 
     private fun remove() {
-        viewModel.remove().observe(this, Observer {
+        viewModel.remove().observe(this, {
             if (it.erro == null) {
                 quandoFinalizaTela()
             } else {

@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import br.com.alura.technews.R
-import br.com.alura.technews.ui.fragment.VisualizaNoticiaFrament
+import br.com.alura.technews.ui.fragment.VisualizaNoticiaFragment
 
 
 private const val TITULO_APPBAR = "Notícia"
@@ -19,14 +19,20 @@ class VisualizaNoticiaActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_visualiza_noticia)
-        title = TITULO_APPBAR
+        val transacao = supportFragmentManager.beginTransaction()
+        val visualizaNoticiaFrament = VisualizaNoticiaFragment()
+        val dados = Bundle()
+        dados.putLong(NOTICIA_ID_CHAVE, noticiaId)
+        visualizaNoticiaFrament.arguments = dados
+        transacao.add(R.id.activity_visualiza_noticia_container, visualizaNoticiaFrament)
+        transacao.commit()
     }
 
     override fun onAttachFragment(fragment: Fragment?) {
         super.onAttachFragment(fragment)
-        if(fragment is VisualizaNoticiaFrament){
+        if (fragment is VisualizaNoticiaFragment) {
             fragment.quandoFinalizaTela = { finish() }
-            fragment.quandoSelecionaMenuEdicao = {abreFormularioEdicao()}
+            fragment.quandoSelecionaMenuEdicao = { abreFormularioEdicao() }
         }
     }
 
