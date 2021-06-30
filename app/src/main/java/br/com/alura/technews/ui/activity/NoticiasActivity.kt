@@ -4,8 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import br.com.alura.technews.R
 import br.com.alura.technews.model.Noticia
+import br.com.alura.technews.ui.activity.extensions.transacaoFragment
 import br.com.alura.technews.ui.fragment.ListaNoticiasFragment
 import br.com.alura.technews.ui.fragment.VisualizaNoticiaFragment
 
@@ -13,32 +15,42 @@ private const val TITULO_APPBAR = "Notícias"
 
 class NoticiasActivity : AppCompatActivity() {
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_noticias)
-        title = TITULO_APPBAR
-        val beginTransaction = supportFragmentManager.beginTransaction()
-        beginTransaction.add(R.id.activity_noticias_container, ListaNoticiasFragment())
-        beginTransaction.commit()
+
+        abreListaNoticias(savedInstanceState)
+    }
+
+    private fun abreListaNoticias(savedInstanceState: Bundle?) {
+        if (savedInstanceState == null) {
+            transacaoFragment {
+                replace(R.id.activity_noticias_container, ListaNoticiasFragment())
+            }
+        }
     }
 
     override fun onAttachFragment(fragment: Fragment?) {
         super.onAttachFragment(fragment)
-        if (fragment is ListaNoticiasFragment) {
-            fragment.quandoNoticiaSelecionada = {
-                abreVisualizadorNoticia(it)
+        when (fragment) {
+            is ListaNoticiasFragment -> {
+                configuraListaNoticias(fragment)
             }
-            fragment.quandoFabSalvaNoticiaClicado = {
-                abreFormularioModoCriacao()
+            is VisualizaNoticiaFragment -> {
+                configuraVisualizaNoticia(fragment)
             }
-        }
-        if (fragment is VisualizaNoticiaFragment) {
-            fragment.quandoFinalizaTela = { finish() }
-            fragment.quandoSelecionaMenuEdicao = { noticiaSelecionada -> abreFormularioEdicao(noticiaSelecionada) }
         }
     }
 
+    private fun configuraVisualizaNoticia(fragment: VisualizaNoticiaFragment) {
+        fragment.quandoFinalizaTela = this::finish
+        fragment.quandoSelecionaMenuEdicao = this::abreFormularioEdicao
+    }
+
+    private fun configuraListaNoticias(fragment: ListaNoticiasFragment) {
+        fragment.quandoNoticiaSelecionada = this::abreVisualizadorNoticia
+        fragment.quandoFabSalvaNoticiaClicado = this::abreFormularioModoCriacao
+    }
 
     private fun abreFormularioModoCriacao() {
         val intent = Intent(this, FormularioNoticiaActivity::class.java)
@@ -46,13 +58,14 @@ class NoticiasActivity : AppCompatActivity() {
     }
 
     private fun abreVisualizadorNoticia(noticia: Noticia) {
-        val transacao = supportFragmentManager.beginTransaction()
         val visualizaNoticiaFrament = VisualizaNoticiaFragment()
         val dados = Bundle()
         dados.putLong(NOTICIA_ID_CHAVE, noticia.id)
         visualizaNoticiaFrament.arguments = dados
-        transacao.replace(R.id.activity_noticias_container, visualizaNoticiaFrament)
-        transacao.commit()
+        transacaoFragment {
+            addToBackStack(null)
+            replace(R.id.activity_noticias_container, visualizaNoticiaFrament)
+        }
     }
 
     private fun abreFormularioEdicao(noticia: Noticia) {

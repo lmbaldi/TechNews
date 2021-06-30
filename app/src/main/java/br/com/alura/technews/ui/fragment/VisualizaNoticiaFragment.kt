@@ -13,6 +13,7 @@ import kotlinx.android.synthetic.main.visualiza_noticia.*
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
+private const val TITULO_APPBAR = "Notícia"
 private const val NOTICIA_NAO_ENCONTRADA = "Notícia não encontrada"
 private const val MENSAGEM_FALHA_REMOCAO = "Não foi possível remover notícia"
 
@@ -27,6 +28,7 @@ class VisualizaNoticiaFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         //sempre habilitar se for usar menu
         setHasOptionsMenu(true)
         buscaNoticiaSelecionada()
@@ -56,6 +58,10 @@ class VisualizaNoticiaFragment : Fragment() {
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        activity?.title = TITULO_APPBAR
+    }
 
     private fun buscaNoticiaSelecionada() {
         viewModel.noticiaEncontrada.observe(

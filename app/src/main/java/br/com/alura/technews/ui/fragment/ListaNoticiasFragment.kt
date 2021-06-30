@@ -19,6 +19,7 @@ import java.lang.IllegalArgumentException
 
 
 private const val MENSAGEM_FALHA_CARREGAR_NOTICIAS = "Não foi possível carregar as novas notícias"
+private const val TITULO_APPBAR = "Notícias"
 
 class ListaNoticiasFragment : Fragment() {
 
@@ -49,6 +50,7 @@ class ListaNoticiasFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        activity?.title = TITULO_APPBAR
         configuraRecyclerView()
         configuraFabAdicionaNoticia()
     }
